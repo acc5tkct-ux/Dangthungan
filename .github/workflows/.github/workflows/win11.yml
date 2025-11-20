@@ -1,0 +1,37 @@
+name: Windows 11 Pro RDP 6 Hours
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360   # 6 giờ
+
+    steps:
+
+    - name: Enable RDP
+      run: |
+        Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+    - name: Create user
+      run: |
+        net user admin1 Admin@123 /add
+        net localgroup administrators admin1 /add
+
+    - name: Display RDP address
+      run: |
+        $ip = (Test-Connection -ComputerName (hostname) -Count 1).IPv4Address.IPAddressToString
+        echo "====================================="
+        echo "      RDP IS NOW READY!"
+        echo "====================================="
+        echo "Connect to this IP in Remote Desktop:"
+        echo "  👉  $ip:3389"
+        echo "Username: ngancute"
+        echo "Password: moaaa@2010"
+        echo "====================================="
+
+    - name: Keep Alive 6 Hours
+      run: |
+        ping -n 21600 127.0.0.1 >nul
